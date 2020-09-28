@@ -3,12 +3,14 @@
 namespace Alura\Leilao\Dao;
 
 use Alura\Leilao\Model\Leilao as ModelLeilao;
+use DateTimeImmutable;
+use PDO;
 
 class Leilao
 {
     private $con;
 
-    public function __construct(\PDO $con)
+    public function __construct(PDO $con)
     {
         $this->con = $con;
     }
@@ -17,8 +19,8 @@ class Leilao
     {
         $sql = 'INSERT INTO leiloes (descricao, finalizado, dataInicio) VALUES (?, ?, ?)';
         $stm = $this->con->prepare($sql);
-        $stm->bindValue(1, $leilao->recuperarDescricao(), \PDO::PARAM_STR);
-        $stm->bindValue(2, $leilao->estaFinalizado(), \PDO::PARAM_BOOL);
+        $stm->bindValue(1, $leilao->recuperarDescricao(), PDO::PARAM_STR);
+        $stm->bindValue(2, $leilao->estaFinalizado(), PDO::PARAM_BOOL);
         $stm->bindValue(3, $leilao->recuperarDataInicio()->format('Y-m-d'));
         $stm->execute();
 
@@ -42,21 +44,22 @@ class Leilao
      */
     public function recuperarFinalizados(): array
     {
-        return $this->recuperarLeiloesSeFinalizado(true);
+        return $this->recuperarLeiloesSeFinalizado(false);
     }
 
     /**
      * @return ModelLeilao[]
+     * @throws \Exception
      */
     private function recuperarLeiloesSeFinalizado(bool $finalizado): array
     {
         $sql = 'SELECT * FROM leiloes WHERE finalizado = ' . ($finalizado ? 1 : 0);
-        $stm = $this->con->query($sql, \PDO::FETCH_ASSOC);
+        $stm = $this->con->query($sql, PDO::FETCH_ASSOC);
 
         $dados = $stm->fetchAll();
         $leiloes = [];
         foreach ($dados as $dado) {
-            $leilao = new ModelLeilao($dado['descricao'], new \DateTimeImmutable($dado['dataInicio']), $dado['id']);
+            $leilao = new ModelLeilao($dado['descricao'], new DateTimeImmutable($dado['dataInicio']), $dado['id']);
             if ($dado['finalizado']) {
                 $leilao->finaliza();
             }
@@ -72,8 +75,8 @@ class Leilao
         $stm = $this->con->prepare($sql);
         $stm->bindValue(':descricao', $leilao->recuperarDescricao());
         $stm->bindValue(':dataInicio', $leilao->recuperarDataInicio()->format('Y-m-d'));
-        $stm->bindValue(':finalizado', $leilao->estaFinalizado(), \PDO::PARAM_BOOL);
-        $stm->bindValue(':id', $leilao->recuperarId(), \PDO::PARAM_INT);
+        $stm->bindValue(':finalizado', $leilao->estaFinalizado(), PDO::PARAM_BOOL);
+        $stm->bindValue(':id', $leilao->recuperarId(), PDO::PARAM_INT);
         $stm->execute();
     }
 }

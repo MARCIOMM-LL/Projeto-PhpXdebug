@@ -1,4 +1,12 @@
 {
+    "name": "miranda/xdebug",
+    "description": "Projeto phpXDebug",
+    "authors": [
+        {
+            "name": "Márcio",
+            "email": "m-andremiranda@outlook.com"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Alura\\Leilao\\": "src/"

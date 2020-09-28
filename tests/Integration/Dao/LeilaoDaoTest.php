@@ -5,17 +5,18 @@ namespace Alura\Leilao\Tests\Integration\Dao;
 use Alura\Leilao\Dao\Leilao as LeilaoDao;
 use Alura\Leilao\Infra\ConnectionCreator;
 use Alura\Leilao\Model\Leilao;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 class LeilaoDaoTest extends TestCase
 {
-    /** @var \PDO */
+    /** @var PDO */
     private static $pdo;
 
     public static function setUpBeforeClass(): void
     {
-        self::$pdo = new \PDO('sqlite::memory:');
-        self::$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        self::$pdo = new PDO('sqlite::memory:');
+        self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         self::$pdo->exec('create table leiloes (
             id INTEGER primary key,
             descricao TEXT,
@@ -31,6 +32,7 @@ class LeilaoDaoTest extends TestCase
 
     /**
      * @dataProvider leiloes
+     * @param array $leiloes
      */
     public function testBuscaLeiloesNaoFinalizados(array $leiloes)
     {
@@ -55,6 +57,7 @@ class LeilaoDaoTest extends TestCase
 
     /**
      * @dataProvider leiloes
+     * @param array $leiloes
      */
     public function testBuscaLeiloesFinalizados(array $leiloes)
     {
@@ -66,6 +69,7 @@ class LeilaoDaoTest extends TestCase
 
         // act
         $leiloes = $leilaoDao->recuperarFinalizados();
+        var_dump($leiloes);
 
         // assert
         self::assertCount(1, $leiloes);
